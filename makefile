@@ -12,6 +12,18 @@ OUTFILE_NAME = encTitleKeysUpdater
 build: all
 clean: makedirectories
 init: clean
+production: tar
+dist: tar
+
+tar: all
+	mkdir "$(TMP_DIR)/tar"
+	mkdir "$(TMP_DIR)/tar/3ds"
+	cp -r "$(BUILD_DIR)/$(OUTFILE_NAME)" "$(TMP_DIR)/tar/3ds"
+	cp "$(BUILD_DIR)/$(OUTFILE_NAME).cia" "$(TMP_DIR)/tar/$(OUTFILE_NAME).cia"
+	cp "$(BUILD_DIR)/$(OUTFILE_NAME).3ds" "$(TMP_DIR)/tar/$(OUTFILE_NAME).3ds"
+	tar cf "$(BUILD_DIR)/$(OUTFILE_NAME).tar" -C "$(TMP_DIR)/tar" . --xform='s!^\./!!'
+	tar --delete --file="$(BUILD_DIR)/$(OUTFILE_NAME).tar" .
+	rm -rf "$(TMP_DIR)/tar"
 
 makedirectories: cleanfiles
 	@echo Making build directory structure
@@ -29,7 +41,7 @@ romfs:
 	@echo Making romfs
 	$(BUILDTOOLS_DIR)/3dstool -cvtf romfs "$(TMP_DIR)/romfs.bin" --romfs-dir "$(SRC_DIR)"
 
-all: clean 3ds cia 3dsx
+all: clean 3ds cia 3dsxpack
 	@echo Cleaning up temp files
 	rm -rf "$(TMP_DIR)"
 	mkdir $(TMP_DIR)
@@ -45,3 +57,8 @@ cia: banner romfs
 	cp -r "$(SRC_DIR)" "$(BUILD_DIR)/$(OUTFILE_NAME)"
 	cp "$(TMP_DIR)/icon.bin" "$(BUILD_DIR)/$(OUTFILE_NAME)/$(OUTFILE_NAME).smdh"
 	cp "$(BUILDTOOLS_DIR)/lpp3ds/lpp-3ds.3dsx" "$(BUILD_DIR)/$(OUTFILE_NAME)/$(OUTFILE_NAME).3dsx"
+3dsxpack: 3dsx
+	mkdir "$(TMP_DIR)/3ds"
+	cp -r "$(BUILD_DIR)/$(OUTFILE_NAME)" "$(TMP_DIR)/3ds"
+	tar cf "$(BUILD_DIR)/$(OUTFILE_NAME).3dsx.tar" -C "$(TMP_DIR)" 3ds
+	rm -rf "$(TMP_DIR)/3ds"
