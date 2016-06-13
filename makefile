@@ -11,6 +11,7 @@ OUTFILE_NAME = encTitleKeysUpdater
 
 build: all
 clean: makedirectories
+init: clean
 
 makedirectories: cleanfiles
 	@echo Making build directory structure
@@ -31,6 +32,7 @@ romfs:
 all: clean 3ds cia 3dsx
 	@echo Cleaning up temp files
 	rm -rf "$(TMP_DIR)"
+	mkdir $(TMP_DIR)
 3ds: banner romfs
 	@echo Building .3ds
 	$(BUILDTOOLS_DIR)/makerom -f cci -o "$(BUILD_DIR)/$(OUTFILE_NAME).3ds" -rsf "$(BUILDTOOLS_DIR)/workarounds/3ds_workaround.rsf" -target d -exefslogo -elf "$(BUILDTOOLS_DIR)/lpp3ds/lpp-3ds.elf" -icon "$(TMP_DIR)/icon.bin" -banner "$(TMP_DIR)/banner.bin" -romfs "$(TMP_DIR)/romfs.bin"
