@@ -22,7 +22,7 @@ You can also use `make clean` to remove all built files.
 
 [Cruel](https://github.com/Cruel/) - for making [freeShop](https://github.com/Cruel/freeShop)
 
-[MatMaf](https://github.com/MatMaf/) - for making the first version of the [Updater](https://github.com/MatMaf/encTitleKeys.bin-Updater) and hosting the encTitleKeys.bin
+[MatMaf](https://github.com/MatMaf/) - for making the first version of the [Updater](https://github.com/MatMaf/encTitleKeys.bin-Updater)
 
 [Rinnegatamante](https://github.com/Rinnegatamante/) - for making [lpp-3ds](https://github.com/Rinnegatamante/lpp-3ds)
 
