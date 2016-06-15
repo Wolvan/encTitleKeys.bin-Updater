@@ -1,11 +1,13 @@
 --[[
-	Define color constants for easier usage
-	in debugPrint calls
+	Define some constants for easier usage
+	later on
 ]]--
 local WHITE = Color.new(255,255,255)
 local YELLOW = Color.new(255,205,66)
 local RED = Color.new(255,0,0)
 local GREEN = Color.new(55,255,0)
+
+local APP_VERSION = "1.2.0"
 
 --[[
 	Libraries that I use get defined here
@@ -23,6 +25,10 @@ local selection = 1
 local localSize = 0
 local parsed = {}
 
+local remVer = nil
+local locVer = nil
+local canUpdate = nil
+
 local home = "Homemenu"
 if System.checkBuild() ~= 1 then
 	home = "Homebrew Launcher"
@@ -32,17 +38,25 @@ local pad = Controls.read()
 local oldpad = pad
 
 --[[
+	String manipulation functions that Lua unfortunately
+	does not natively support.
+]]--
+function string.split(self, sep)
+	local sep, fields = sep or ":", {}
+	local pattern = string.format("([^%s]+)", sep)
+	self:gsub(pattern, function(c) fields[#fields+1] = c end)
+	return fields
+end
+function string.startsWith(String, Start)
+	return string.sub(String,1,string.len(Start))==Start
+end
+
+--[[
 	This function just presents an error to
 	the user. Overriding the keypressFunction
 	allows changing behavior of the error
 ]]--
 function showError(errorMsg, keypressFunction)
-	local function split(self, sep)
-		local sep, fields = sep or ":", {}
-		local pattern = string.format("([^%s]+)", sep)
-		self:gsub(pattern, function(c) fields[#fields+1] = c end)
-		return fields
-	end
 	keypressFunction = keypressFunction or function()
 		pad = Controls.read()
 		if Controls.check(pad, KEY_A) and not Controls.check(oldpad, KEY_A) then
@@ -57,7 +71,7 @@ function showError(errorMsg, keypressFunction)
 	Screen.clear(BOTTOM_SCREEN)
 	Screen.waitVblankStart()
 	Screen.flip()
-	local splitString = split(errorMsg, "\n")
+	local splitString = errorMsg:split("\n")
 	for k,v in pairs(splitString) do
 		Screen.debugPrint(5, ((k-1)*15)+5, v, RED, TOP_SCREEN)
 	end
@@ -112,6 +126,44 @@ function checkWifi()
 			oldpad = pad
 		end)
 	end
+end
+
+--[[
+	Functions to parse and compare SemVer compliant
+	versions. parseVersion accepts and parses Strings
+	in the format MAJOR.MINOR.PATCH and returns a table
+	{major, minor, version} which can be used by
+	isUpdateAvailable
+]]--
+function parseVersion(verString)
+	if verString == nil or verString == "" then
+		verString = "0.0.0"
+	end
+	
+	verString = verString:gsub(" ", "")
+	local version = {}
+	local splitVersion = verString:split(".")
+	if splitVersion[1]:lower():startsWith("v") then
+		splitVersion[1] = splitVersion[1]:sub(2)
+	end
+	
+	version.major = tonumber(splitVersion[1]) or 0
+	version.minor = tonumber(splitVersion[2]) or 0
+	version.patch = tonumber(splitVersion[3]) or 0
+	
+	return version
+end
+function isUpdateAvailable(localVersion, remoteVersion)
+	if remoteVersion.major > localVersion.major then
+		return true
+	end
+	if (remoteVersion.minor > localVersion.minor) and (remoteVersion.major >= localVersion.major) then
+		return true
+	end
+	if (remoteVersion.patch > localVersion.patch) and (remoteVersion.major >= localVersion.major) and (remoteVersion.minor >= localVersion.minor) then
+		return true
+	end
+	return false
 end
 
 function update()
@@ -224,6 +276,14 @@ function init()
 		end)
 	end
 	Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
+	
+	line = 65
+	Screen.debugPrint(5, line, "Checking for Updates...", WHITE, TOP_SCREEN)
+	locVer = parseVersion(APP_VERSION)
+	remVer = parseVersion(parsed.current_version)
+	canUpdate = isUpdateAvailable(locVer, remVer)
+	Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
+	
 	main()
 end
 
