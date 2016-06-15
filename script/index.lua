@@ -96,6 +96,10 @@ if System.checkBuild() ~= 2 then
 	}
 end
 
+--[[
+	Check if the User has Wi-Fi disabled and an
+	Internet connection is available
+]]--
 function checkWifi()
 	if not Network.isWifiEnabled() then
 		showError("Wi-Fi is disabled. Restart and try again.\nPress A to go back to "..home..".", function()
@@ -111,6 +115,20 @@ function checkWifi()
 end
 
 function update()
+	local function tryDownload()
+		System.deleteFile("/freeShop/encTitleKeys.bin")
+		Network.downloadFile("http://enctitlekeys.wolvan.at/", "/freeShop/encTitleKeys.bin")
+		local filesize = 0
+		if System.doesFileExist("/freeShop/encTitleKeys.bin") then
+			local encTitleKeys = io.open("/freeShop/encTitleKeys.bin", FREAD)
+			filesize = tonumber(io.size(encTitleKeys))
+			io.close(encTitleKeys)
+		end
+		if filesize == 0 then
+			return false
+		end
+		return true
+	end
 	checkWifi()
 	Screen.refresh()
 	Screen.clear(TOP_SCREEN)
@@ -118,15 +136,15 @@ function update()
 	Screen.flip()
 	Screen.debugPrint(5, 5, "Downloading encTitleKeys.bin...", GREEN, TOP_SCREEN)
 	System.createDirectory("/freeShop")
-	System.deleteFile("/freeShop/encTitleKeys.bin")
-	Network.downloadFile("http://enctitlekeys.wolvan.at/", "/freeShop/encTitleKeys.bin")
-	local filesize = 0
-	if System.doesFileExist("/freeShop/encTitleKeys.bin") then
-		local encTitleKeys = io.open("/freeShop/encTitleKeys.bin", FREAD)
-		filesize = tonumber(io.size(encTitleKeys))
-		io.close(encTitleKeys)
+	
+	local tries = 0
+	local success = false
+	while (tries < 3) and (not success) do
+		tries = tries + 1
+		success = tryDownload()
 	end
-	if filesize == 0 then
+	
+	if not success then
 		showError("encTitleKeys.bin failed to download,\nplease try again.\n \nIf this keeps happening, check\nyour internet connection.\n \nIf you believe this is a bug,\nopen an issue on my Github.\n \nPress A to return to the Main Menu")
 	end
 	Screen.debugPrint(5, 50, "Done!", GREEN, TOP_SCREEN)
@@ -148,30 +166,49 @@ end
 
 
 function init()
+	local function tryDownload()
+		local remoteData = Network.requestString("http://enctitlekeys.wolvan.at/meta.php")
+		if remoteData ~= "" and remoteData ~= nil and type(remoteData) == "string" then
+			parsed = json.decode(remoteData)
+		else
+			return false
+		end
+		return true
+	end
 	Screen.refresh()
 	Screen.clear(TOP_SCREEN)
 	Screen.clear(BOTTOM_SCREEN)
 	Screen.waitVblankStart()
 	Screen.flip()
-	Screen.debugPrint(5, 5, "Initialising Updater, please wait...", WHITE, TOP_SCREEN)
-	Screen.debugPrint(5, 20, "Checking Wi-Fi...", WHITE, TOP_SCREEN)
+	local line = 5
+	Screen.debugPrint(5, line, "Initialising Updater, please wait...", WHITE, TOP_SCREEN)
+	
+	line = 20
+	Screen.debugPrint(5, line, "Checking Wi-Fi...", WHITE, TOP_SCREEN)
 	checkWifi()
-	Screen.debugPrint(270, 20, "[OK]", GREEN, TOP_SCREEN)
-	Screen.debugPrint(5, 35, "Checking encTitleKeys.bin...", WHITE, TOP_SCREEN)
+	Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
+	
+	line = 35
+	Screen.debugPrint(5, line, "Checking encTitleKeys.bin...", WHITE, TOP_SCREEN)
 	if System.doesFileExist("/freeShop/encTitleKeys.bin") then
 		local encTitleKeys = io.open("/freeShop/encTitleKeys.bin", FREAD)
 		localSize = io.size(encTitleKeys)
 		io.close(encTitleKeys)
-		Screen.debugPrint(270, 35, "[OK]", GREEN, TOP_SCREEN)
+		Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
 	else
-		Screen.debugPrint(270, 35, "[File not found]", YELLOW, TOP_SCREEN)
+		Screen.debugPrint(270, line, "[File not found]", YELLOW, TOP_SCREEN)
 	end
-	Screen.debugPrint(5, 50, "Retrieving data from Server...", WHITE, TOP_SCREEN)
-	local remoteData = Network.requestString("http://enctitlekeys.wolvan.at/meta.php")
-	Screen.debugPrint(5, 5, remoteData, WHITE, BOTTOM_SCREEN)
-	if remoteData ~= "" and remoteData ~= nil and type(remoteData) == "string" then
-		parsed = json.decode(remoteData)
-	else
+	
+	line = 50
+	Screen.debugPrint(5, line, "Retrieving data from Server...", WHITE, TOP_SCREEN)
+	local tries = 0
+	local success = false
+	while (tries < 3) and (not success) do
+		tries = tries + 1
+		success = tryDownload()
+	end
+	
+	if not success then
 		showError("Error occured while fetching remote data\nPress A to try again\nPress B to return to "..home..".", function()
 			pad = Controls.read()
 			if Controls.check(pad, KEY_A) and not Controls.check(oldpad, KEY_A) then
@@ -186,7 +223,7 @@ function init()
 			oldpad = pad
 		end)
 	end
-	Screen.debugPrint(270, 50, "[OK]", GREEN, TOP_SCREEN)
+	Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
 	main()
 end
 
@@ -202,14 +239,17 @@ function printBottomScreen()
 	else
 		Screen.debugPrint(5, 20, "Your encTitleKeys.bin is up to date!", GREEN, BOTTOM_SCREEN)
 	end
-	Screen.debugPrint(5, 50, "Thanks to the following people:", WHITE, BOTTOM_SCREEN)
-	Screen.debugPrint(5, 65, "Cruel - For giving us FreeShop", WHITE, BOTTOM_SCREEN)
-	Screen.debugPrint(5, 80, "MatMaf - For the first updater", WHITE, BOTTOM_SCREEN)
-	Screen.debugPrint(5, 95, "Rinnegatamante - For LPP3DS", WHITE, BOTTOM_SCREEN)
-	Screen.debugPrint(5, 110, "You - For using this tool at all", WHITE, BOTTOM_SCREEN)
-	Screen.debugPrint(5, 125, "AFgt - For testing the updater", WHITE, BOTTOM_SCREEN)
-	Screen.debugPrint(5, 140, "Some other people I forgot", WHITE, BOTTOM_SCREEN)
-	Screen.debugPrint(5, 190, "v1.1.0", WHITE, BOTTOM_SCREEN)
+	if canUpdate then
+		Screen.debugPrint(5, 220, "Updater version "..remVer.major.."."..remVer.minor.."."..remVer.patch.." now available!", RED, TOP_SCREEN)
+	end
+	Screen.debugPrint(5, 65, "Thanks to the following people:", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 80, "Cruel - For giving us FreeShop", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 95, "MatMaf - For the first updater", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 110, "Rinnegatamante - For LPP3DS", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 125, "You - For using this tool at all", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 140, "AFgt - For testing the updater", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 155, "Some other people I forgot", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 190, "v"..APP_VERSION, WHITE, BOTTOM_SCREEN)
 	Screen.debugPrint(5, 205, "by MatMaf", WHITE, BOTTOM_SCREEN)
 	Screen.debugPrint(5, 220, "forked by Wolvan", WHITE, BOTTOM_SCREEN)
 end
