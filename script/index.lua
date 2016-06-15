@@ -81,6 +81,33 @@ function showError(errorMsg, keypressFunction)
 end
 
 --[[
+	Messages of the day which one gets randomly
+	printed on App Init
+]]--
+local motds = {
+	{
+		msg = "ZTD Leak when",
+		color = WHITE
+	},
+	{
+		msg = "Tool presented by Wolvan",
+		color = WHITE
+	},
+	{
+		msg = ">bricked",
+		color = GREEN
+	},
+	{
+		msg = "freeshop? More like fREEEEEshop",
+		color = RED
+	},
+	{
+		msg = "In 5 hours",
+		color = WHITE
+	}
+}
+
+--[[
 	This table contains a dynamically generated main menu
 	Each Entry has a text and a callback property which is
 	used to build the menu on runtime instead of hardcoding it
@@ -234,6 +261,12 @@ function init()
 	Screen.flip()
 	local line = 5
 	Screen.debugPrint(5, line, "Initialising Updater, please wait...", WHITE, TOP_SCREEN)
+	
+	local h,m,s = System.getTime()
+	local seed = (h * 60 * 60) + (m * 60) + s
+	math.randomseed(seed)
+	local motd = motds[math.random(#motds)]
+	Screen.debugPrint(5, 110, motd.msg, motd.color, BOTTOM_SCREEN)
 	
 	line = 20
 	Screen.debugPrint(5, line, "Checking Wi-Fi...", WHITE, TOP_SCREEN)
