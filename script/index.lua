@@ -75,6 +75,9 @@ function showError(errorMsg, keypressFunction)
 	for k,v in pairs(splitString) do
 		Screen.debugPrint(5, ((k-1)*15)+5, v, RED, TOP_SCREEN)
 	end
+	Screen.debugPrint(5, 95, "GitHub can be found at", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 110, "https://github.com/Wolvan", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 125, "/encTitleKeys.bin-Updater", WHITE, BOTTOM_SCREEN)
 	while true do
 		keypressFunction()
 	end
