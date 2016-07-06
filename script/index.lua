@@ -119,6 +119,14 @@ local menu_options = {
 		callback = function() update() end
 	},
 	{
+		text = "Download latest decTitleKeys.bin",
+		callback = function() downloadDecTitleKeys() end
+	},
+	{
+		text = "Download latest seeddb.bin",
+		callback = function() downloadSeedDB() end
+	},
+	{
 		text = "Return to "..home,
 		callback = System.exit
 	}
@@ -193,34 +201,39 @@ function isUpdateAvailable(localVersion, remoteVersion)
 	return false
 end
 
-function update()
-	local function tryDownload()
-		System.deleteFile("/freeShop/encTitleKeys.bin")
-		Network.downloadFile("http://enctitlekeys.wolvan.at/", "/freeShop/encTitleKeys.bin")
-		local filesize = 0
-		if System.doesFileExist("/freeShop/encTitleKeys.bin") then
-			local encTitleKeys = io.open("/freeShop/encTitleKeys.bin", FREAD)
-			filesize = tonumber(io.size(encTitleKeys))
-			io.close(encTitleKeys)
-		end
-		if filesize == 0 then
-			return false
-		end
-		return true
+function tryDownloadFile(path, downloadURL)
+	System.deleteFile(path)
+	Network.downloadFile(downloadURL, path)
+	local filesize = 0
+	if System.doesFileExist(path) then
+		local encTitleKeys = io.open(path, FREAD)
+		filesize = tonumber(io.size(encTitleKeys))
+		io.close(encTitleKeys)
 	end
+	if filesize == 0 then
+		return false
+	end
+	return true
+end
+
+function prepareFileDownload(filename)
 	checkWifi()
 	Screen.refresh()
 	Screen.clear(TOP_SCREEN)
 	Screen.waitVblankStart()
 	Screen.flip()
-	Screen.debugPrint(5, 5, "Downloading encTitleKeys.bin...", GREEN, TOP_SCREEN)
+	Screen.debugPrint(5, 5, "Downloading "..filename.."...", GREEN, TOP_SCREEN)
+end
+
+function update()
+	prepareFileDownload("encTitleKeys.bin")
 	System.createDirectory("/freeShop")
 	
 	local tries = 0
 	local success = false
 	while (tries < 3) and (not success) do
 		tries = tries + 1
-		success = tryDownload()
+		success = tryDownloadFile("/freeShop/encTitleKeys.bin", "http://enctitlekeys.wolvan.at/")
 	end
 	
 	if not success then
@@ -229,20 +242,87 @@ function update()
 	Screen.debugPrint(5, 50, "Done!", GREEN, TOP_SCREEN)
 	if System.checkBuild() ~= 2 then Screen.debugPrint(5, 95, "Press A to launch freeShop", GREEN, TOP_SCREEN) end
 	Screen.debugPrint(5, 110, "Press B to go back to "..home, GREEN, TOP_SCREEN)
+	Screen.debugPrint(5, 125, "Press X to go back to the menu", GREEN, TOP_SCREEN)
 	while true do
 		pad = Controls.read()
-		if Controls.check(pad, KEY_B) then
+		if Controls.check(pad, KEY_B) and not Controls.check(oldpad, KEY_B) then
 			Screen.waitVblankStart()
 			Screen.flip()
 			System.exit()
-		elseif Controls.check(pad, KEY_A) and System.checkBuild() ~= 2 then
+		elseif Controls.check(pad, KEY_A) and not Controls.check(oldpad, KEY_A) and System.checkBuild() ~= 2 then
 			Screen.waitVblankStart()
 			Screen.flip()
 			System.launchCIA(0x0f12ee00,SDMC)
+		elseif Controls.check(pad, KEY_X) and not Controls.check(oldpad, KEY_X) then
+			Screen.waitVblankStart()
+			Screen.flip()
+			main()
 		end
+		oldpad = pad
 	end
 end
-
+function downloadSeedDB()
+	prepareFileDownload("seeddb.bin")
+	System.createDirectory("/freeShop")
+	
+	local tries = 0
+	local success = false
+	while (tries < 3) and (not success) do
+		tries = tries + 1
+		success = tryDownloadFile("/seeddb.bin", "http://enctitlekeys.wolvan.at/seeddb.php")
+	end
+	
+	if not success then
+		showError("seeddb.bin failed to download,\nplease try again.\n \nIf this keeps happening, check\nyour internet connection.\n \nIf you believe this is a bug,\nopen an issue on my Github.\n \nPress A to return to the Main Menu")
+	end
+	Screen.debugPrint(5, 50, "Done!", GREEN, TOP_SCREEN)
+	Screen.debugPrint(5, 95, "Press A to go back to the menu", GREEN, TOP_SCREEN)
+	Screen.debugPrint(5, 110, "Press B to return to "..home, GREEN, TOP_SCREEN)
+	while true do
+		pad = Controls.read()
+		if Controls.check(pad, KEY_B) and not Controls.check(oldpad, KEY_B) then
+			Screen.waitVblankStart()
+			Screen.flip()
+			System.exit()
+		elseif Controls.check(pad, KEY_A) and not Controls.check(oldpad, KEY_A) then
+			Screen.waitVblankStart()
+			Screen.flip()
+			main()
+		end
+		oldpad = pad
+	end
+end
+function downloadDecTitleKeys()
+	prepareFileDownload("decTitleKeys.bin")
+	System.createDirectory("/freeShop")
+	
+	local tries = 0
+	local success = false
+	while (tries < 3) and (not success) do
+		tries = tries + 1
+		success = tryDownloadFile("/decTitleKeys.bin", "http://enctitlekeys.wolvan.at/decTitleKeys.php")
+	end
+	
+	if not success then
+		showError("decTitleKeys.bin failed to download,\nplease try again.\n \nIf this keeps happening, check\nyour internet connection.\n \nIf you believe this is a bug,\nopen an issue on my Github.\n \nPress A to return to the Main Menu")
+	end
+	Screen.debugPrint(5, 50, "Done!", GREEN, TOP_SCREEN)
+	Screen.debugPrint(5, 95, "Press A to go back to the menu", GREEN, TOP_SCREEN)
+	Screen.debugPrint(5, 110, "Press B to return to "..home, GREEN, TOP_SCREEN)
+	while true do
+		pad = Controls.read()
+		if Controls.check(pad, KEY_B) and not Controls.check(oldpad, KEY_B) then
+			Screen.waitVblankStart()
+			Screen.flip()
+			System.exit()
+		elseif Controls.check(pad, KEY_A) and not Controls.check(oldpad, KEY_A) then
+			Screen.waitVblankStart()
+			Screen.flip()
+			main()
+		end
+		oldpad = pad
+	end
+end
 
 function init()
 	local function tryDownload()
