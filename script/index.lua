@@ -21,6 +21,8 @@ function jsonfunction()
 end
 local json = jsonfunction()
 
+local config = {}
+
 local selection = 1
 local localSize = 0
 local parsed = {}
