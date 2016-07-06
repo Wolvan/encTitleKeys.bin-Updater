@@ -8,6 +8,8 @@ local RED = Color.new(255,0,0)
 local GREEN = Color.new(55,255,0)
 
 local APP_VERSION = "1.2.0"
+local APP_DIR = "/encTitleKeysUpdater"
+local APP_CONFIG = APP_DIR.."/config.json"
 
 --[[
 	Libraries that I use get defined here
@@ -138,6 +140,54 @@ if System.checkBuild() ~= 2 then
 		end
 	}
 end
+
+--[[
+	Functions to save and load config from a config
+	file. The config table (which gets set further
+	up in this file) gets encoded as JSON file and
+	saved to the SD. 
+	Loading reads that file (or creates it if it 
+	doesn't exist before reading), decodes the JSON
+	and then overwrites each value of the config
+	table that is defined in the decoded JSON Object.
+	This way, settings that are not stored in the config
+	yet just use the default value set in the config table.
+]]--
+function saveConfig()
+	local jsonString = json.encode(config, { indent = true })
+	System.createDirectory(APP_DIR)
+	local file = io.open(APP_CONFIG, FCREATE)
+	io.write(file, 0, jsonString, jsonString:len())
+	io.close(file)
+end
+function loadConfig()
+	local configPath = APP_CONFIG
+	if not System.doesFileExist(configPath) then
+		saveConfig()
+	end
+	local file = io.open(configPath, FREAD)
+	
+	local filesize = 0
+	filesize = tonumber(io.size(file))
+	if filesize == 0 then
+		io.close(file)
+		saveConfig()
+		file = io.open(configPath, FREAD)
+	end
+	
+	local file_contents = io.read(file, 0, tonumber(io.size(file)))
+	io.close(file)
+	local loaded_config = json.decode(file_contents)
+	if type(loaded_config) == "table" then
+		for k,v in pairs(loaded_config) do
+			config[k] = v
+		end
+	else
+		return false
+	end
+	return true
+end
+
 
 --[[
 	Check if the User has Wi-Fi disabled and an
@@ -318,6 +368,14 @@ function init()
 	remVer = parseVersion(parsed.current_version)
 	canUpdate = isUpdateAvailable(locVer, remVer)
 	Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
+	
+	line = 80
+	Screen.debugPrint(5, line, "Loading config...", WHITE, TOP_SCREEN)
+	if loadConfig() then
+		Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
+	else
+		Screen.debugPrint(270, line, "[FAILED]", RED, TOP_SCREEN)
+	end
 	
 	main()
 end
