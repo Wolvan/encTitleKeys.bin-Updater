@@ -104,6 +104,10 @@ local motds = {
 	{
 		msg = "In 5 hours",
 		color = WHITE
+	},
+	{
+		msg = "Can I install DS cias?",
+		color = WHITE
 	}
 }
 
