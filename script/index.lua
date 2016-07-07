@@ -7,7 +7,7 @@ local YELLOW = Color.new(255,205,66)
 local RED = Color.new(255,0,0)
 local GREEN = Color.new(55,255,0)
 
-local APP_VERSION = "1.2.0"
+local APP_VERSION = "1.3.0"
 local APP_DIR = "/encTitleKeysUpdater"
 local APP_CONFIG = APP_DIR.."/config.json"
 
@@ -575,7 +575,8 @@ function printBottomScreen()
 	Screen.debugPrint(5, 110, "Rinnegatamante - For LPP3DS", WHITE, BOTTOM_SCREEN)
 	Screen.debugPrint(5, 125, "You - For using this tool at all", WHITE, BOTTOM_SCREEN)
 	Screen.debugPrint(5, 140, "AFgt - For testing the updater", WHITE, BOTTOM_SCREEN)
-	Screen.debugPrint(5, 155, "Some other people I forgot", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 155, "Nai - For testing the updater", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 170, "Some other people I forgot", WHITE, BOTTOM_SCREEN)
 	Screen.debugPrint(5, 190, "v"..APP_VERSION, WHITE, BOTTOM_SCREEN)
 	Screen.debugPrint(5, 205, "by MatMaf", WHITE, BOTTOM_SCREEN)
 	Screen.debugPrint(5, 220, "forked by Wolvan", WHITE, BOTTOM_SCREEN)
