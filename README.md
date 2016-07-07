@@ -16,7 +16,12 @@ The building is made possible through a `make` script, meaning you need to have 
 
 Just run `make` (or `make all`/`make build`) to get your binaries in the build directory
 
+`build 3ds`, `build 3dsx` and `build cia` are also available in case not all binaries need to be built.
+
 You can also use `make clean` to remove all built files.
+
+##Additional help
+Need help with the tool? Or maybe you'd like to modify it but have no idea how or where to start? Join [This Discord channel ![](https://discordapp.com/api/servers/175668882231525376/widget.png)](https://discord.gg/fXHkQNP) which I usually hang out with and ask away, I am always happy to help.
 
 ##Credits
 
