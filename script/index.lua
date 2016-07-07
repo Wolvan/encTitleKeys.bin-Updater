@@ -33,7 +33,7 @@ local config = {
 		value = false
 	},
 	downloadRetryCount = {
-		text = "Download Retries"
+		text = "Download Retries",
 		value = 3,
 		minValue = 1,
 		maxValue = 10
