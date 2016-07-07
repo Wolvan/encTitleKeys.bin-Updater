@@ -155,10 +155,6 @@ local menu_options = {
 	{
 		text = "Download latest encTitleKeys.bin",
 		callback = function() update() end
-	},
-	{
-		text = "Return to "..home,
-		callback = System.exit
 	}
 }
 --[[
@@ -174,6 +170,26 @@ if System.checkBuild() ~= 2 then
 		end
 	}
 end
+
+--[[
+	Only add the Settings Menu if there are actually
+	settings
+]]--
+if countTableElements(config) > 0 then
+	menu_options[#menu_options+1] = {
+		text = "Settings",
+		callback = function() optionsMenu() end
+	}
+end
+
+--[[
+	Make sure the Return Button is the last option
+	in the list
+]]--
+	menu_options[#menu_options+1] = {
+		text = "Return to "..home,
+		callback = System.exit
+	}
 
 --[[
 	Functions to save and load config from a config
