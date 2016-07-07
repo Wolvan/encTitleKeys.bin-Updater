@@ -8,6 +8,8 @@ local RED = Color.new(255,0,0)
 local GREEN = Color.new(55,255,0)
 
 local APP_VERSION = "1.2.0"
+local APP_DIR = "/encTitleKeysUpdater"
+local APP_CONFIG = APP_DIR.."/config.json"
 
 --[[
 	Libraries that I use get defined here
@@ -21,9 +23,13 @@ function jsonfunction()
 end
 local json = jsonfunction()
 
+local config = {}
+
 local selection = 1
+local option_selection = 1
 local localSize = 0
 local parsed = {}
+local config_backup = {}
 
 local remVer = nil
 local locVer = nil
@@ -49,6 +55,38 @@ function string.split(self, sep)
 end
 function string.startsWith(String, Start)
 	return string.sub(String,1,string.len(Start))==Start
+end
+
+--[[
+	A way to copy tables without linking them through
+	references
+]]--
+function deepcopy(orig)
+	local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[deepcopy(orig_key)] = deepcopy(orig_value)
+        end
+        setmetatable(copy, deepcopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
+--[[
+	A function to give the actual number of elements
+	in a table compared to # which returns the last
+	number index
+]]--
+function countTableElements(tbl)
+	local i = 0
+	for k,v in pairs(tbl) do
+		i = i + 1
+	end
+	return i
 end
 
 --[[
@@ -124,10 +162,6 @@ local menu_options = {
 	{
 		text = "Download latest encTitleKeys.bin",
 		callback = function() update() end
-	},
-	{
-		text = "Return to "..home,
-		callback = System.exit
 	}
 }
 --[[
@@ -143,6 +177,74 @@ if System.checkBuild() ~= 2 then
 		end
 	}
 end
+
+--[[
+	Only add the Settings Menu if there are actually
+	settings
+]]--
+if countTableElements(config) > 0 then
+	menu_options[#menu_options+1] = {
+		text = "Settings",
+		callback = function() optionsMenu() end
+	}
+end
+
+--[[
+	Make sure the Return Button is the last option
+	in the list
+]]--
+	menu_options[#menu_options+1] = {
+		text = "Return to "..home,
+		callback = System.exit
+	}
+
+--[[
+	Functions to save and load config from a config
+	file. The config table (which gets set further
+	up in this file) gets encoded as JSON file and
+	saved to the SD. 
+	Loading reads that file (or creates it if it 
+	doesn't exist before reading), decodes the JSON
+	and then overwrites each value of the config
+	table that is defined in the decoded JSON Object.
+	This way, settings that are not stored in the config
+	yet just use the default value set in the config table.
+]]--
+function saveConfig()
+	local jsonString = json.encode(config, { indent = true })
+	System.createDirectory(APP_DIR)
+	local file = io.open(APP_CONFIG, FCREATE)
+	io.write(file, 0, jsonString, jsonString:len())
+	io.close(file)
+end
+function loadConfig()
+	local configPath = APP_CONFIG
+	if not System.doesFileExist(configPath) then
+		saveConfig()
+	end
+	local file = io.open(configPath, FREAD)
+	
+	local filesize = 0
+	filesize = tonumber(io.size(file))
+	if filesize == 0 then
+		io.close(file)
+		saveConfig()
+		file = io.open(configPath, FREAD)
+	end
+	
+	local file_contents = io.read(file, 0, tonumber(io.size(file)))
+	io.close(file)
+	local loaded_config = json.decode(file_contents)
+	if type(loaded_config) == "table" then
+		for k,v in pairs(loaded_config) do
+			config[k] = v
+		end
+	else
+		return false
+	end
+	return true
+end
+
 
 --[[
 	Check if the User has Wi-Fi disabled and an
@@ -276,11 +378,20 @@ function init()
 	Screen.debugPrint(5, 110, motd.msg, motd.color, BOTTOM_SCREEN)
 	
 	line = 20
+	Screen.debugPrint(5, line, "Loading config...", WHITE, TOP_SCREEN)
+	if loadConfig() then
+		config_backup = deepcopy(config)
+		Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
+	else
+		Screen.debugPrint(270, line, "[FAILED]", RED, TOP_SCREEN)
+	end
+	
+	line = 35
 	Screen.debugPrint(5, line, "Checking Wi-Fi...", WHITE, TOP_SCREEN)
 	checkWifi()
 	Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
 	
-	line = 35
+	line = 50
 	Screen.debugPrint(5, line, "Checking encTitleKeys.bin...", WHITE, TOP_SCREEN)
 	if System.doesFileExist("/freeShop/encTitleKeys.bin") then
 		local encTitleKeys = io.open("/freeShop/encTitleKeys.bin", FREAD)
@@ -291,7 +402,7 @@ function init()
 		Screen.debugPrint(270, line, "[File not found]", YELLOW, TOP_SCREEN)
 	end
 	
-	line = 50
+	line = 65
 	Screen.debugPrint(5, line, "Retrieving data from Server...", WHITE, TOP_SCREEN)
 	local tries = 0
 	local success = false
@@ -317,7 +428,7 @@ function init()
 	end
 	Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
 	
-	line = 65
+	line = 80
 	Screen.debugPrint(5, line, "Checking for Updates...", WHITE, TOP_SCREEN)
 	locVer = parseVersion(APP_VERSION)
 	remVer = parseVersion(parsed.current_version)
@@ -401,6 +512,89 @@ function main()
 		end
 		oldpad = pad
 		main()
+	end
+end
+
+function optionsMenu()
+	oldpad = pad
+	Screen.waitVblankStart()
+	Screen.refresh()
+	
+	Screen.clear(TOP_SCREEN)
+	Screen.debugPrint(5, 5, "Options", YELLOW, TOP_SCREEN)
+	Screen.debugPrint(20, (option_selection * 15) + 5, ">", WHITE, TOP_SCREEN)
+	local config_keys = {}
+	local i = 1
+	for k,v in pairs(config) do
+		Screen.debugPrint(30, (i * 15) + 5, v.text, WHITE, TOP_SCREEN)
+		if type(v.value) == "boolean" then
+			if v.value then
+				Screen.debugPrint(350, (i * 15) + 5, "On", GREEN, TOP_SCREEN)
+			else
+				Screen.debugPrint(350, (i * 15) + 5, "Off", RED, TOP_SCREEN)
+			end
+		elseif type(v.value) == "number" then
+			Screen.debugPrint(350, (i * 15) + 5, v.value, YELLOW, TOP_SCREEN)
+		end
+		
+		config_keys[#config_keys+1] = k
+		i = i + 1
+	end
+	
+	Screen.clear(BOTTOM_SCREEN)
+	Screen.debugPrint(5, 110, "up/down - Select option", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 125, "left/right - Change setting", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 140, "A - Save", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 155, "B - Cancel", WHITE, BOTTOM_SCREEN)
+	
+	Screen.flip()
+	
+	while true do
+		pad = Controls.read()
+		if Controls.check(pad, KEY_DDOWN) and not Controls.check(oldpad, KEY_DDOWN) then
+			option_selection = option_selection + 1
+			if (option_selection > #config_keys) then
+				option_selection = 1
+			end
+		elseif Controls.check(pad, KEY_DUP) and not Controls.check(oldpad, KEY_DUP) then
+			option_selection = option_selection - 1
+			if (option_selection < 1) then
+				option_selection = #config_keys
+			end
+		elseif Controls.check(pad, KEY_DLEFT) and not Controls.check(oldpad, KEY_DLEFT) then
+			local currentSetting = config[config_keys[option_selection]]
+			if type(currentSetting.value) == "boolean" then
+				currentSetting.value = not currentSetting.value
+			elseif type(currentSetting.value) == "number" then
+				currentSetting.value = currentSetting.value - 1
+				if currentSetting.minValue then
+					if currentSetting.value < currentSetting.minValue then currentSetting.value = currentSetting.minValue end
+				end
+				config[config_keys[option_selection]].value = currentSetting.value
+			end
+		elseif Controls.check(pad, KEY_DRIGHT) and not Controls.check(oldpad, KEY_DRIGHT) then
+			local currentSetting = config[config_keys[option_selection]]
+			if type(currentSetting.value) == "boolean" then
+				currentSetting.value = not currentSetting.value
+			elseif type(currentSetting.value) == "number" then
+				currentSetting.value = currentSetting.value + 1
+				if currentSetting.maxValue then
+					if currentSetting.value > currentSetting.maxValue then currentSetting.value = currentSetting.maxValue end
+				end
+				config[config_keys[option_selection]].value = currentSetting.value
+			end
+		elseif Controls.check(pad, KEY_A) and not Controls.check(oldpad, KEY_A) then
+			oldpad = pad
+			config_backup = deepcopy(config)
+			saveConfig()
+			main()
+		elseif Controls.check(pad, KEY_B) and not Controls.check(oldpad, KEY_B) then
+			oldpad = pad
+			config = deepcopy(config_backup)
+			main()
+		end
+		oldpad = pad
+		optionsMenu()
 	end
 end
 
