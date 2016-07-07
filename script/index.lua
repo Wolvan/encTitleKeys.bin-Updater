@@ -371,11 +371,20 @@ function init()
 	Screen.debugPrint(5, 110, motd.msg, motd.color, BOTTOM_SCREEN)
 	
 	line = 20
+	Screen.debugPrint(5, line, "Loading config...", WHITE, TOP_SCREEN)
+	if loadConfig() then
+		config_backup = deepcopy(config)
+		Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
+	else
+		Screen.debugPrint(270, line, "[FAILED]", RED, TOP_SCREEN)
+	end
+	
+	line = 35
 	Screen.debugPrint(5, line, "Checking Wi-Fi...", WHITE, TOP_SCREEN)
 	checkWifi()
 	Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
 	
-	line = 35
+	line = 50
 	Screen.debugPrint(5, line, "Checking encTitleKeys.bin...", WHITE, TOP_SCREEN)
 	if System.doesFileExist("/freeShop/encTitleKeys.bin") then
 		local encTitleKeys = io.open("/freeShop/encTitleKeys.bin", FREAD)
@@ -386,7 +395,7 @@ function init()
 		Screen.debugPrint(270, line, "[File not found]", YELLOW, TOP_SCREEN)
 	end
 	
-	line = 50
+	line = 65
 	Screen.debugPrint(5, line, "Retrieving data from Server...", WHITE, TOP_SCREEN)
 	local tries = 0
 	local success = false
@@ -412,21 +421,12 @@ function init()
 	end
 	Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
 	
-	line = 65
+	line = 80
 	Screen.debugPrint(5, line, "Checking for Updates...", WHITE, TOP_SCREEN)
 	locVer = parseVersion(APP_VERSION)
 	remVer = parseVersion(parsed.current_version)
 	canUpdate = isUpdateAvailable(locVer, remVer)
 	Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
-	
-	line = 80
-	Screen.debugPrint(5, line, "Loading config...", WHITE, TOP_SCREEN)
-	if loadConfig() then
-		config_backup = deepcopy(config)
-		Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
-	else
-		Screen.debugPrint(270, line, "[FAILED]", RED, TOP_SCREEN)
-	end
 	
 	main()
 end
