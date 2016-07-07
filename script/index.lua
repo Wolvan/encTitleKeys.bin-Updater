@@ -26,8 +26,10 @@ local json = jsonfunction()
 local config = {}
 
 local selection = 1
+local option_selection = 1
 local localSize = 0
 local parsed = {}
+local config_backup = {}
 
 local remVer = nil
 local locVer = nil
@@ -404,6 +406,7 @@ function init()
 	line = 80
 	Screen.debugPrint(5, line, "Loading config...", WHITE, TOP_SCREEN)
 	if loadConfig() then
+		config_backup = deepcopy(config)
 		Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
 	else
 		Screen.debugPrint(270, line, "[FAILED]", RED, TOP_SCREEN)
@@ -486,6 +489,89 @@ function main()
 		end
 		oldpad = pad
 		main()
+	end
+end
+
+function optionsMenu()
+	oldpad = pad
+	Screen.waitVblankStart()
+	Screen.refresh()
+	
+	Screen.clear(TOP_SCREEN)
+	Screen.debugPrint(5, 5, "Options", YELLOW, TOP_SCREEN)
+	Screen.debugPrint(20, (option_selection * 15) + 5, ">", WHITE, TOP_SCREEN)
+	local config_keys = {}
+	local i = 1
+	for k,v in pairs(config) do
+		Screen.debugPrint(30, (i * 15) + 5, v.text, WHITE, TOP_SCREEN)
+		if type(v.value) == "boolean" then
+			if v.value then
+				Screen.debugPrint(350, (i * 15) + 5, "On", GREEN, TOP_SCREEN)
+			else
+				Screen.debugPrint(350, (i * 15) + 5, "Off", RED, TOP_SCREEN)
+			end
+		elseif type(v.value) == "number" then
+			Screen.debugPrint(350, (i * 15) + 5, v.value, YELLOW, TOP_SCREEN)
+		end
+		
+		config_keys[#config_keys+1] = k
+		i = i + 1
+	end
+	
+	Screen.clear(BOTTOM_SCREEN)
+	Screen.debugPrint(5, 110, "up/down - Select option", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 125, "left/right - Change setting", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 140, "A - Save", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 155, "B - Cancel", WHITE, BOTTOM_SCREEN)
+	
+	Screen.flip()
+	
+	while true do
+		pad = Controls.read()
+		if Controls.check(pad, KEY_DDOWN) and not Controls.check(oldpad, KEY_DDOWN) then
+			option_selection = option_selection + 1
+			if (option_selection > #config_keys) then
+				option_selection = 1
+			end
+		elseif Controls.check(pad, KEY_DUP) and not Controls.check(oldpad, KEY_DUP) then
+			option_selection = option_selection - 1
+			if (option_selection < 1) then
+				option_selection = #config_keys
+			end
+		elseif Controls.check(pad, KEY_DLEFT) and not Controls.check(oldpad, KEY_DLEFT) then
+			local currentSetting = config[config_keys[option_selection]]
+			if type(currentSetting.value) == "boolean" then
+				currentSetting.value = not currentSetting.value
+			elseif type(currentSetting.value) == "number" then
+				currentSetting.value = currentSetting.value - 1
+				if currentSetting.minValue then
+					if currentSetting.value < currentSetting.minValue then currentSetting.value = currentSetting.minValue end
+				end
+				config[config_keys[option_selection]].value = currentSetting.value
+			end
+		elseif Controls.check(pad, KEY_DRIGHT) and not Controls.check(oldpad, KEY_DRIGHT) then
+			local currentSetting = config[config_keys[option_selection]]
+			if type(currentSetting.value) == "boolean" then
+				currentSetting.value = not currentSetting.value
+			elseif type(currentSetting.value) == "number" then
+				currentSetting.value = currentSetting.value + 1
+				if currentSetting.maxValue then
+					if currentSetting.value > currentSetting.maxValue then currentSetting.value = currentSetting.maxValue end
+				end
+				config[config_keys[option_selection]].value = currentSetting.value
+			end
+		elseif Controls.check(pad, KEY_A) and not Controls.check(oldpad, KEY_A) then
+			oldpad = pad
+			config_backup = deepcopy(config)
+			saveConfig()
+			main()
+		elseif Controls.check(pad, KEY_B) and not Controls.check(oldpad, KEY_B) then
+			oldpad = pad
+			config = deepcopy(config_backup)
+			main()
+		end
+		oldpad = pad
+		optionsMenu()
 	end
 end
 
