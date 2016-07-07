@@ -325,6 +325,17 @@ function isUpdateAvailable(localVersion, remoteVersion)
 	return false
 end
 
+
+--[[
+	Check App State to close the App in case
+	of exitting from home menu
+]]--
+function checkForExit()
+	if System.checkStatus() == APP_EXITING then
+		System.exit()
+	end
+end
+
 function tryDownloadFile(path, downloadURL)
 	System.deleteFile(path)
 	Network.downloadFile(downloadURL, path)
@@ -615,6 +626,7 @@ function main()
 		elseif Controls.check(pad, KEY_HOME) and System.checkBuild() == 1 then
 			System.showHomeMenu()
 		end
+		checkForExit()
 		oldpad = pad
 		main()
 	end
