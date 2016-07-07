@@ -27,6 +27,10 @@ local config = {
 	enableUpdateCheck = {
 		text = "Enable Update Check",
 		value = true
+	},
+	autoUpdateTitleKeysOnStartup = {
+		text = "Auto update encTitleKeys.bin",
+		value = false
 	}
 }
 
@@ -442,6 +446,12 @@ function init()
 		Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
 	else
 		Screen.debugPrint(270, line, "[SKIPPED]", YELLOW, TOP_SCREEN)
+	end
+	
+	if config.autoUpdateTitleKeysOnStartup.value then
+		if localSize ~= parsed.size then
+			update()
+		end
 	end
 	
 	main()
