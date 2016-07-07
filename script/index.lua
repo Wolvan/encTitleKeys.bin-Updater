@@ -31,6 +31,12 @@ local config = {
 	autoUpdateTitleKeysOnStartup = {
 		text = "Auto update encTitleKeys.bin",
 		value = false
+	},
+	downloadRetryCount = {
+		text = "Download Retries"
+		value = 3,
+		minValue = 1,
+		maxValue = 10
 	}
 }
 
@@ -336,7 +342,7 @@ function update()
 	
 	local tries = 0
 	local success = false
-	while (tries < 3) and (not success) do
+	while (tries < config.downloadRetryCount.value) and (not success) do
 		tries = tries + 1
 		success = tryDownload()
 	end
@@ -415,7 +421,7 @@ function init()
 	Screen.debugPrint(5, line, "Retrieving data from Server...", WHITE, TOP_SCREEN)
 	local tries = 0
 	local success = false
-	while (tries < 3) and (not success) do
+	while (tries < config.downloadRetryCount.value) and (not success) do
 		tries = tries + 1
 		success = tryDownload()
 	end
