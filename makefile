@@ -14,6 +14,8 @@ clean: makedirectories
 init: clean
 production: tar
 dist: tar
+dist-compress: targz
+production-compress: targz
 
 tar: all
 	mkdir "$(TMP_DIR)/tar"
@@ -24,7 +26,10 @@ tar: all
 	tar cf "$(BUILD_DIR)/$(OUTFILE_NAME).tar" -C "$(TMP_DIR)/tar" . --xform='s!^\./!!'
 	tar --delete --file="$(BUILD_DIR)/$(OUTFILE_NAME).tar" .
 	rm -rf "$(TMP_DIR)/tar"
-
+targz: tar
+	gzip "$(BUILD_DIR)/$(OUTFILE_NAME).tar"
+	gzip "$(BUILD_DIR)/$(OUTFILE_NAME).3dsx.tar"
+	
 makedirectories: cleanfiles
 	@echo Making build directory structure
 	mkdir $(BUILD_DIR)
