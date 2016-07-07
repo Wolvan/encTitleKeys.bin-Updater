@@ -142,7 +142,7 @@ end
 ]]--
 local motds = {
 	{
-		msg = "ZTD Leak when",
+		msg = "MHG Leak when",
 		color = WHITE
 	},
 	{
@@ -163,6 +163,10 @@ local motds = {
 	},
 	{
 		msg = "Can I install DS cias?",
+		color = WHITE
+	},
+	{
+		msg = "How can I downgrade from 11.0?",
 		color = WHITE
 	}
 }
