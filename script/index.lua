@@ -56,6 +56,38 @@ function string.startsWith(String, Start)
 end
 
 --[[
+	A way to copy tables without linking them through
+	references
+]]--
+function deepcopy(orig)
+	local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[deepcopy(orig_key)] = deepcopy(orig_value)
+        end
+        setmetatable(copy, deepcopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
+--[[
+	A function to give the actual number of elements
+	in a table compared to # which returns the last
+	number index
+]]--
+function countTableElements(tbl)
+	local i = 0
+	for k,v in pairs(tbl) do
+		i = i + 1
+	end
+	return i
+end
+
+--[[
 	This function just presents an error to
 	the user. Overriding the keypressFunction
 	allows changing behavior of the error
