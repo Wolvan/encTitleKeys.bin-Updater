@@ -23,7 +23,12 @@ function jsonfunction()
 end
 local json = jsonfunction()
 
-local config = {}
+local config = {
+	enableUpdateCheck = {
+		text = "Enable Update Check",
+		value = true
+	}
+}
 
 local selection = 1
 local option_selection = 1
@@ -430,10 +435,14 @@ function init()
 	
 	line = 80
 	Screen.debugPrint(5, line, "Checking for Updates...", WHITE, TOP_SCREEN)
-	locVer = parseVersion(APP_VERSION)
-	remVer = parseVersion(parsed.current_version)
-	canUpdate = isUpdateAvailable(locVer, remVer)
-	Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
+	if config.enableUpdateCheck.value then
+		locVer = parseVersion(APP_VERSION)
+		remVer = parseVersion(parsed.current_version)
+		canUpdate = isUpdateAvailable(locVer, remVer)
+		Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
+	else
+		Screen.debugPrint(270, line, "[SKIPPED]", YELLOW, TOP_SCREEN)
+	end
 	
 	main()
 end
