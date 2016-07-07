@@ -23,7 +23,12 @@ function jsonfunction()
 end
 local json = jsonfunction()
 
-local config = {}
+local config = {
+	autoUpdateTitleKeysOnStartup = {
+		text = "Auto update encTitleKeys.bin",
+		value = false
+	}
+}
 
 local selection = 1
 local option_selection = 1
@@ -427,6 +432,12 @@ function init()
 	remVer = parseVersion(parsed.current_version)
 	canUpdate = isUpdateAvailable(locVer, remVer)
 	Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
+	
+	if config.autoUpdateTitleKeysOnStartup.value then
+		if localSize ~= parsed.size then
+			update()
+		end
+	end
 	
 	main()
 end
