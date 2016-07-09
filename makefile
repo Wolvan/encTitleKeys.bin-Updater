@@ -19,6 +19,9 @@ dist-compress: targz
 production-compress: dist-compress
 dist-zip: zip
 production-zip: dist-zip
+dist-tarzip: tarzip
+production-tarzip: dist-tarzip
+dist-all: dist-tarzip
 
 tar: alltar
 	@echo Packing Dist Files as .tar
@@ -44,7 +47,21 @@ zip: allzip
 	cd "$(TMP_DIR)/zip"	&& zip -9qr "$(OUTFILE_NAME).zip" "."
 	cp "$(TMP_DIR)/zip/$(OUTFILE_NAME).zip" "$(BUILD_DIR)/$(OUTFILE_NAME).zip"
 	rm -rf "$(TMP_DIR)/zip"
-	
+tarzip: clean 3ds 3dsxtarzip cia cleantempfiles
+	@echo Packing Dist Files as .zip and .tar.gz
+	mkdir "$(TMP_DIR)/dist"
+	mkdir "$(TMP_DIR)/dist/3ds"
+	cp -r "$(BUILD_DIR)/$(OUTFILE_NAME)" "$(TMP_DIR)/dist/3ds"
+	cp "$(BUILD_DIR)/$(OUTFILE_NAME).cia" "$(TMP_DIR)/dist/$(OUTFILE_NAME).cia"
+	cp "$(BUILD_DIR)/$(OUTFILE_NAME).3ds" "$(TMP_DIR)/dist/$(OUTFILE_NAME).3ds"
+	cd "$(TMP_DIR)/dist"	&& zip -9qr "$(OUTFILE_NAME).zip" "."
+	cp "$(TMP_DIR)/dist/$(OUTFILE_NAME).zip" "$(BUILD_DIR)/$(OUTFILE_NAME).zip"
+	rm "$(TMP_DIR)/dist/$(OUTFILE_NAME).zip"
+	tar cf "$(BUILD_DIR)/$(OUTFILE_NAME).tar" -C "$(TMP_DIR)/dist" . --xform='s!^\./!!'
+	tar --delete --file="$(BUILD_DIR)/$(OUTFILE_NAME).tar" .
+	gzip "$(BUILD_DIR)/$(OUTFILE_NAME).tar"
+	rm -rf "$(TMP_DIR)/dist"
+
 makedirectories: cleanfiles
 	@echo Making build directory structure
 	mkdir $(BUILD_DIR)
@@ -94,3 +111,12 @@ cia: banner romfs
 	cp "$(TMP_DIR)/$(OUTFILE_NAME).zip" "$(BUILD_DIR)/$(OUTFILE_NAME).3dsx.zip"
 	rm -rf "$(TMP_DIR)/3ds"
 	rm "$(TMP_DIR)/$(OUTFILE_NAME).zip"
+3dsxtarzip: 3dsx
+	@echo Packing .3dsx as .tar and .zip
+	mkdir "$(TMP_DIR)/3ds"
+	cp -r "$(BUILD_DIR)/$(OUTFILE_NAME)" "$(TMP_DIR)/3ds"
+	tar czf "$(BUILD_DIR)/$(OUTFILE_NAME).3dsx.tar.gz" -C "$(TMP_DIR)" 3ds
+	cd "$(TMP_DIR)"	&& zip -9qr "$(OUTFILE_NAME).zip" "3ds"
+	cp "$(TMP_DIR)/$(OUTFILE_NAME).zip" "$(BUILD_DIR)/$(OUTFILE_NAME).3dsx.zip"
+	rm "$(TMP_DIR)/$(OUTFILE_NAME).zip"
+	rm -rf "$(TMP_DIR)/3ds"
