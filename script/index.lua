@@ -342,7 +342,7 @@ end
 
 function tryDownloadFile(path, downloadURL)
 	System.deleteFile(path)
-	Network.downloadFile(downloadURL, path)
+	Network.downloadFile(downloadURL, path, "User-Agent: TitleKeysTools/"..APP_VERSION, "GET")
 	local filesize = 0
 	if System.doesFileExist(path) then
 		local encTitleKeys = io.open(path, FREAD)
@@ -372,7 +372,7 @@ function update()
 	local success = false
 	while (tries < config.downloadRetryCount.value) and (not success) do
 		tries = tries + 1
-		success = tryDownloadFile("/freeShop/encTitleKeys.bin", "http://enctitlekeys.wolvan.at/")
+		success = tryDownloadFile("/freeShop/encTitleKeys.bin", "https://3ds.titlekeys.com/downloadenc")
 	end
 	
 	if not success then
@@ -408,7 +408,7 @@ function downloadSeedDB()
 	local success = false
 	while (tries < config.downloadRetryCount.value) and (not success) do
 		tries = tries + 1
-		success = tryDownloadFile("/seeddb.bin", "http://enctitlekeys.wolvan.at/seeddb.php")
+		success = tryDownloadFile("/seeddb.bin", "https://3ds.titlekeys.com/seeddb")
 	end
 	
 	if not success then
@@ -439,7 +439,7 @@ function downloadDecTitleKeys()
 	local success = false
 	while (tries < config.downloadRetryCount.value) and (not success) do
 		tries = tries + 1
-		success = tryDownloadFile("/decTitleKeys.bin", "http://enctitlekeys.wolvan.at/decTitleKeys.php")
+		success = tryDownloadFile("/decTitleKeys.bin", "https://3ds.titlekeys.com/download")
 	end
 	
 	if not success then
