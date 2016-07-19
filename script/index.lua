@@ -8,7 +8,7 @@ local RED = Color.new(255,0,0)
 local GREEN = Color.new(55,255,0)
 
 local APP_VERSION = "1.3.1"
-local APP_DIR = "/encTitleKeysUpdater"
+local APP_DIR = "/titlekeysTools"
 local APP_CONFIG = APP_DIR.."/config.json"
 
 --[[
@@ -477,6 +477,7 @@ function downloadDecTitleKeys()
 end
 
 function init()
+	System.renameDirectory("/encTitleKeysUpdater", APP_DIR)
 	local function tryDownload()
 		local remoteData = Network.requestString("http://enctitlekeys.wolvan.at/meta.php")
 		if remoteData ~= "" and remoteData ~= nil and type(remoteData) == "string" then
@@ -588,14 +589,13 @@ function printBottomScreen()
 	end
 	Screen.debugPrint(5, 65, "Thanks to the following people:", WHITE, BOTTOM_SCREEN)
 	Screen.debugPrint(5, 80, "Cruel - For giving us FreeShop", WHITE, BOTTOM_SCREEN)
-	Screen.debugPrint(5, 95, "MatMaf - For the first updater", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 95, "MatMaf - For the original updater", WHITE, BOTTOM_SCREEN)
 	Screen.debugPrint(5, 110, "Rinnegatamante - For LPP3DS", WHITE, BOTTOM_SCREEN)
 	Screen.debugPrint(5, 125, "You - For using this tool at all", WHITE, BOTTOM_SCREEN)
 	Screen.debugPrint(5, 140, "AFgt - For testing the updater", WHITE, BOTTOM_SCREEN)
 	Screen.debugPrint(5, 155, "Nai - For testing the updater", WHITE, BOTTOM_SCREEN)
 	Screen.debugPrint(5, 170, "Some other people I forgot", WHITE, BOTTOM_SCREEN)
-	Screen.debugPrint(5, 190, "v"..APP_VERSION, WHITE, BOTTOM_SCREEN)
-	Screen.debugPrint(5, 205, "by MatMaf", WHITE, BOTTOM_SCREEN)
+	Screen.debugPrint(5, 205, "v"..APP_VERSION, WHITE, BOTTOM_SCREEN)
 	Screen.debugPrint(5, 220, "forked by Wolvan", WHITE, BOTTOM_SCREEN)
 end
 
@@ -605,7 +605,7 @@ end
 ]]--
 function printTopScreen()
 	Screen.clear(TOP_SCREEN)
-	Screen.debugPrint(5, 5, "encTitleKeysUpdater for freeShop", YELLOW, TOP_SCREEN)
+	Screen.debugPrint(5, 5, "Titlekeys Tools", YELLOW, TOP_SCREEN)
 	Screen.debugPrint(20, (selection * 15) + 5, ">", WHITE, TOP_SCREEN)
 	for k,v in pairs(menu_options) do
 		Screen.debugPrint(30, (k * 15) + 5, v.text, WHITE, TOP_SCREEN)

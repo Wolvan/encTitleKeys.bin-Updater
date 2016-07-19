@@ -1,13 +1,13 @@
-NAME = "$(OUTFILE_NAME)"
-DESCRIPTION = "$(OUTFILE_NAME) for freeShop"
-AUTHOR = "MatMaf & Wolvan"
+NAME = "Titlekeys Tools"
+DESCRIPTION = "Tools for the 3ds Titlekeys website"
+AUTHOR = "Wolvan"
 
 ASSET_DIR = assets
 BUILDTOOLS_DIR = buildtools
 BUILD_DIR = build
 TMP_DIR = $(BUILD_DIR)/tmp
 SRC_DIR = script
-OUTFILE_NAME = encTitleKeysUpdater
+OUTFILE_NAME = TitlekeysTools
 
 build: all
 all: alltar
