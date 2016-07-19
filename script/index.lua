@@ -37,6 +37,10 @@ local config = {
 		value = 3,
 		minValue = 1,
 		maxValue = 10
+	},
+	launchFreeshopAfterUpdate = {
+		text = "Launch Freeshop automatically",
+		value = false
 	}
 }
 
@@ -382,6 +386,12 @@ function update()
 	localSize = io.size(encTitleKeys)
 	io.close(encTitleKeys)
 	Screen.debugPrint(5, 50, "Done!", GREEN, TOP_SCREEN)
+	if System.checkBuild() == 1 and config.launchFreeshopAfterUpdate.value then
+		pad = Controls.read()
+		if not Controls.check(pad, KEY_SELECT) then
+			System.launchCIA(0x0f12ee00,SDMC)
+		end
+	end
 	if System.checkBuild() ~= 2 then Screen.debugPrint(5, 95, "Press A to launch freeShop", GREEN, TOP_SCREEN) end
 	Screen.debugPrint(5, 110, "Press B to go back to "..home, GREEN, TOP_SCREEN)
 	Screen.debugPrint(5, 125, "Press X to go back to the menu", GREEN, TOP_SCREEN)
