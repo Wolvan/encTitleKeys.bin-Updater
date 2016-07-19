@@ -378,6 +378,9 @@ function update()
 	if not success then
 		showError("encTitleKeys.bin failed to download,\nplease try again.\n \nIf this keeps happening, check\nyour internet connection.\n \nIf you believe this is a bug,\nopen an issue on my Github.\n \nPress A to return to the Main Menu")
 	end
+	local encTitleKeys = io.open("/freeShop/encTitleKeys.bin", FREAD)
+	localSize = io.size(encTitleKeys)
+	io.close(encTitleKeys)
 	Screen.debugPrint(5, 50, "Done!", GREEN, TOP_SCREEN)
 	if System.checkBuild() ~= 2 then Screen.debugPrint(5, 95, "Press A to launch freeShop", GREEN, TOP_SCREEN) end
 	Screen.debugPrint(5, 110, "Press B to go back to "..home, GREEN, TOP_SCREEN)
