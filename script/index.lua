@@ -10,6 +10,7 @@ local GREEN = Color.new(55,255,0)
 local APP_VERSION = "1.4.0"
 local APP_DIR = "/titlekeysTools"
 local APP_CONFIG = APP_DIR.."/config.json"
+local API_URL = "https://3ds.titlekeys.com/"
 
 --[[
 	Libraries that I use get defined here
@@ -189,6 +190,10 @@ local menu_options = {
 	{
 		text = "Download latest decTitleKeys.bin",
 		callback = function() downloadDecTitleKeys() end
+	},
+	{
+		text = "Download decTitleKeys.bin to encrypt",
+		callback = function() downloadDecTitleKeysForEnc() end
 	},
 	{
 		text = "Download latest seeddb.bin",
@@ -376,7 +381,7 @@ function update()
 	local success = false
 	while (tries < config.downloadRetryCount.value) and (not success) do
 		tries = tries + 1
-		success = tryDownloadFile("/freeShop/encTitleKeys.bin", "https://3ds.titlekeys.com/downloadenc")
+		success = tryDownloadFile("/freeShop/encTitleKeys.bin", API_URL.."downloadenc")
 	end
 	
 	if not success then
@@ -415,13 +420,12 @@ function update()
 end
 function downloadSeedDB()
 	prepareFileDownload("seeddb.bin")
-	System.createDirectory("/freeShop")
 	
 	local tries = 0
 	local success = false
 	while (tries < config.downloadRetryCount.value) and (not success) do
 		tries = tries + 1
-		success = tryDownloadFile("/seeddb.bin", "https://3ds.titlekeys.com/seeddb")
+		success = tryDownloadFile("/seeddb.bin", API_URL.."seeddb")
 	end
 	
 	if not success then
@@ -446,17 +450,46 @@ function downloadSeedDB()
 end
 function downloadDecTitleKeys()
 	prepareFileDownload("decTitleKeys.bin")
-	System.createDirectory("/freeShop")
 	
 	local tries = 0
 	local success = false
 	while (tries < config.downloadRetryCount.value) and (not success) do
 		tries = tries + 1
-		success = tryDownloadFile("/decTitleKeys.bin", "https://3ds.titlekeys.com/download")
+		success = tryDownloadFile("/decTitleKeys.bin", API_URL.."download")
 	end
 	
 	if not success then
 		showError("decTitleKeys.bin failed to download,\nplease try again.\n \nIf this keeps happening, check\nyour internet connection.\n \nIf you believe this is a bug,\nopen an issue on my Github.\n \nPress A to return to the Main Menu")
+	end
+	Screen.debugPrint(5, 50, "Done!", GREEN, TOP_SCREEN)
+	Screen.debugPrint(5, 95, "Press A to go back to the menu", GREEN, TOP_SCREEN)
+	Screen.debugPrint(5, 110, "Press B to return to "..home, GREEN, TOP_SCREEN)
+	while true do
+		pad = Controls.read()
+		if Controls.check(pad, KEY_B) and not Controls.check(oldpad, KEY_B) then
+			Screen.waitVblankStart()
+			Screen.flip()
+			System.exit()
+		elseif Controls.check(pad, KEY_A) and not Controls.check(oldpad, KEY_A) then
+			Screen.waitVblankStart()
+			Screen.flip()
+			main()
+		end
+		oldpad = pad
+	end
+end
+function downloadDecTitleKeysForEnc()
+	prepareFileDownload("decTitleKeys_forEnc.bin")
+	
+	local tries = 0
+	local success = false
+	while (tries < config.downloadRetryCount.value) and (not success) do
+		tries = tries + 1
+		success = tryDownloadFile("/decTitleKeys_forEnc.bin", API_URL.."downloadmissingforencryption")
+	end
+	
+	if not success then
+		showError("decTitleKeys_forEnc.bin failed to download,\nplease try again.\n \nIf this keeps happening, check\nyour internet connection.\n \nIf you believe this is a bug,\nopen an issue on my Github.\n \nPress A to return to the Main Menu")
 	end
 	Screen.debugPrint(5, 50, "Done!", GREEN, TOP_SCREEN)
 	Screen.debugPrint(5, 95, "Press A to go back to the menu", GREEN, TOP_SCREEN)
