@@ -9,6 +9,9 @@ Open up the App and select `Download latest encTitleKeys.bin`
 
 You can also use the .3ds version for a flashcard.
 
+## Nightlies
+Nightlies are available at [the official automatic Nightly build page](https://wolvan.github.io/encTitleKeys.bin-Updater/build/) and build whenever changes get pushed to the `master` branch
+
 ##Build instructions
 The building is made possible through a `make` script, meaning you need to have `make` installed and in your path. If you already use devkitArm then you are good to go
 
