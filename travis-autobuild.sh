@@ -31,6 +31,7 @@ if [ "$TRAVIS_REPO_SLUG" == "$GH_REPO" ] && [ "$TRAVIS_PULL_REQUEST" == "false" 
   git checkout -f -t -b gh-pages origin/gh-pages
   git merge --no-commit --no-ff $GH_CI_BRANCH -m "Merge $GH_CI_BRANCH $TRAVIS_COMMIT"
   git reset
+  chmod +x buildtools/UNIX/*
   make tarzip
   git add -f build
   git diff --staged --quiet build || {
