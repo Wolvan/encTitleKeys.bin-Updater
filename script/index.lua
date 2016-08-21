@@ -151,10 +151,6 @@ end
 ]]--
 local motds = {
 	{
-		msg = "MHG Leak when",
-		color = WHITE
-	},
-	{
 		msg = "Tool presented by Wolvan",
 		color = WHITE
 	},
