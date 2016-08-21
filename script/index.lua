@@ -635,6 +635,8 @@ function init()
 	end
 	Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
 	
+	Screen.debugPrint(5, 110, motd.msg, motd.color, BOTTOM_SCREEN)
+	
 	line = 50
 	Screen.debugPrint(5, line, "Loading config...", WHITE, TOP_SCREEN)
 	if loadConfig() then
