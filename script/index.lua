@@ -185,6 +185,10 @@ local motds = {
 		color = WHITE
 	},
 	{
+		msg = "Use Homebr3w for easy Homebrew dl",
+		color = WHITE
+	},
+	{
 		msg = ">bricked",
 		color = GREEN
 	},
