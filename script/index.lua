@@ -253,6 +253,7 @@ end
 function saveConfig()
 	local jsonString = json.encode(config, { indent = true })
 	System.createDirectory(APP_DIR)
+	System.deleteFile(APP_CONFIG)
 	local file = io.open(APP_CONFIG, FCREATE)
 	io.write(file, 0, jsonString, jsonString:len())
 	io.close(file)
