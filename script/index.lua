@@ -8,7 +8,7 @@ local RED = Color.new(255,0,0)
 local GREEN = Color.new(55,255,0)
 
 local APP_VERSION = "1.5.0"
-local APP_DIR = "/titlekeysTools"
+local APP_DIR = "/3ds/data/titlekeysTools"
 local APP_CONFIG = APP_DIR.."/config.json"
 local APP_LIBS_DIR = APP_DIR.."/Libraries"
 local APP_TEMP_DIR = APP_DIR.."/tmp"
@@ -595,7 +595,10 @@ function downloadDecTitleKeysForEnc()
 end
 
 function init()
+	System.createDirectory("/3ds")
+	System.createDirectory("/3ds/data")
 	System.renameDirectory("/encTitleKeysUpdater", APP_DIR)
+	System.renameDirectory("/titlekeysTools", APP_DIR)
 	local function tryDownload()
 		local remoteData = Network.requestString("http://enctitlekeys.wolvan.at/meta.php")
 		if remoteData ~= "" and remoteData ~= nil and type(remoteData) == "string" then
