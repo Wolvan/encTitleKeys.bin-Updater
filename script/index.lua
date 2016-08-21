@@ -33,6 +33,10 @@ local config = {
 		text = "Auto update encTitleKeys.bin",
 		value = false
 	},
+	useFreeShop1Path = {
+		text = "Use Freeshop 1.x Path",
+		value = false
+	},
 	downloadRetryCount = {
 		text = "Download Retries",
 		value = 3,
@@ -375,19 +379,26 @@ end
 
 function update()
 	prepareFileDownload("encTitleKeys.bin")
-	System.createDirectory("/freeShop")
+	local freeshopPath = "/3ds/data/freeShop"
+	if config.useFreeShop1Path.value then
+		freeshopPath = "/freeShop"
+	else
+		System.createDirectory("/3ds")
+		System.createDirectory("/3ds/data")
+	end
+	System.createDirectory(freeshopPath)
 	
 	local tries = 0
 	local success = false
 	while (tries < config.downloadRetryCount.value) and (not success) do
 		tries = tries + 1
-		success = tryDownloadFile("/freeShop/encTitleKeys.bin", API_URL.."downloadenc")
+		success = tryDownloadFile(freeshopPath.."/encTitleKeys.bin", API_URL.."downloadenc")
 	end
 	
 	if not success then
 		showError("encTitleKeys.bin failed to download,\nplease try again.\n \nIf this keeps happening, check\nyour internet connection.\n \nIf you believe this is a bug,\nopen an issue on my Github.\n \nPress A to return to the Main Menu")
 	end
-	local encTitleKeys = io.open("/freeShop/encTitleKeys.bin", FREAD)
+	local encTitleKeys = io.open(freeshopPath.."/encTitleKeys.bin", FREAD)
 	localSize = io.size(encTitleKeys)
 	io.close(encTitleKeys)
 	Screen.debugPrint(5, 50, "Done!", GREEN, TOP_SCREEN)
@@ -550,8 +561,10 @@ function init()
 	
 	line = 50
 	Screen.debugPrint(5, line, "Checking encTitleKeys.bin...", WHITE, TOP_SCREEN)
-	if System.doesFileExist("/freeShop/encTitleKeys.bin") then
-		local encTitleKeys = io.open("/freeShop/encTitleKeys.bin", FREAD)
+	local freeshopPath = "/3ds/data/freeshop"
+	if config.useFreeShop1Path.value then freeshopPath = "/freeshop" end
+	if System.doesFileExist(freeshopPath.."/encTitleKeys.bin") then
+		local encTitleKeys = io.open(freeshopPath.."/encTitleKeys.bin", FREAD)
 		localSize = io.size(encTitleKeys)
 		io.close(encTitleKeys)
 		Screen.debugPrint(270, line, "[OK]", GREEN, TOP_SCREEN)
