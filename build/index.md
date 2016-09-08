@@ -7,14 +7,16 @@ Nightly builds are generated automatically through [Travis-CI](https://travis-ci
 
 ## Warning: These builds may be unstable and may contain bugs. If you use these builds and find any problems, please open a new Issue at [https://github.com/Wolvan/encTitleKeys.bin-Updater/issues](https://github.com/Wolvan/encTitleKeys.bin-Updater/issues)
 
-Latest commit: [#98f2371](https://github.com/Wolvan/encTitleKeys.bin-Updater/commit/98f2371f6b83ba06b0ad03eec5166964435ea25e)<br>
-Build date: Sun Aug 21 13:26:55 UTC 2016
+Latest commit: [#233cf9f](https://github.com/Wolvan/encTitleKeys.bin-Updater/commit/233cf9f320cce33b47a9ed967dca4e90b5d0fe64)<br>
+Build date: Thu Sep  8 17:53:30 UTC 2016
 
 | Download Link | File Size |
 |---------------|-----------|
 | [TitlekeysTools.3ds](https://Wolvan.github.io/encTitleKeys.bin-Updater/build/TitlekeysTools.3ds) | 1.7M |
 | [TitlekeysTools.cia](https://Wolvan.github.io/encTitleKeys.bin-Updater/build/TitlekeysTools.cia) | 1.7M |
-| [TitlekeysTools.tar.gz](https://Wolvan.github.io/encTitleKeys.bin-Updater/build/TitlekeysTools.tar.gz) | 3.0M |
-| [TitlekeysTools.zip](https://Wolvan.github.io/encTitleKeys.bin-Updater/build/TitlekeysTools.zip) | 3.0M |
+| [TitlekeysTools.3dsx.tar.gz](https://Wolvan.github.io/encTitleKeys.bin-Updater/build/TitlekeysTools.3dsx.tar.gz) | 1.1M |
+| [TitlekeysTools.tar.gz](https://Wolvan.github.io/encTitleKeys.bin-Updater/build/TitlekeysTools.tar.gz) | 4.0M |
+| [TitlekeysTools.3dsx.zip](https://Wolvan.github.io/encTitleKeys.bin-Updater/build/TitlekeysTools.3dsx.zip) | 1.1M |
+| [TitlekeysTools.zip](https://Wolvan.github.io/encTitleKeys.bin-Updater/build/TitlekeysTools.zip) | 4.0M |
 
 QR Code for Homebr3w.cia Build:<br>![QR Code](https://Wolvan.github.io/encTitleKeys.bin-Updater/build/QRCode.jpg)
