@@ -7,7 +7,7 @@ local YELLOW = Color.new(255,205,66)
 local RED = Color.new(255,0,0)
 local GREEN = Color.new(55,255,0)
 
-local APP_VERSION = "1.5.0"
+local APP_VERSION = "1.6.0"
 local APP_DIR = "/3ds/data/titlekeysTools"
 local APP_CONFIG = APP_DIR.."/config.json"
 local APP_LIBS_DIR = APP_DIR.."/Libraries"
