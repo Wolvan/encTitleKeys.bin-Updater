@@ -7,8 +7,8 @@ Nightly builds are generated automatically through [Travis-CI](https://travis-ci
 
 ## Warning: These builds may be unstable and may contain bugs. If you use these builds and find any problems, please open a new Issue at [https://github.com/Wolvan/encTitleKeys.bin-Updater/issues](https://github.com/Wolvan/encTitleKeys.bin-Updater/issues)
 
-Latest commit: [#233cf9f](https://github.com/Wolvan/encTitleKeys.bin-Updater/commit/233cf9f320cce33b47a9ed967dca4e90b5d0fe64)<br>
-Build date: Thu Sep  8 17:53:30 UTC 2016
+Latest commit: [#ca3dbd3](https://github.com/Wolvan/encTitleKeys.bin-Updater/commit/ca3dbd31af9140f57e63a42864abd83c9bf4c40a)<br>
+Build date: Sun Sep 11 15:50:34 UTC 2016
 
 | Download Link | File Size |
 |---------------|-----------|
