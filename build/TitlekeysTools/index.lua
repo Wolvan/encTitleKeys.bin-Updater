@@ -7,7 +7,7 @@ local YELLOW = Color.new(255,205,66)
 local RED = Color.new(255,0,0)
 local GREEN = Color.new(55,255,0)
 
-local APP_VERSION = "1.6.0"
+local APP_VERSION = "1.6.1"
 local APP_DIR = "/3ds/data/titlekeysTools"
 local APP_CONFIG = APP_DIR.."/config.json"
 local APP_LIBS_DIR = APP_DIR.."/Libraries"
@@ -457,12 +457,13 @@ end
 
 function update()
 	prepareFileDownload("encTitleKeys.bin")
-	local freeshopPath = "/3ds/data/freeShop"
+	local freeshopPath = "/3ds/data/freeShop/keys"
 	if config.useFreeShop1Path.value then
 		freeshopPath = "/freeShop"
 	else
 		System.createDirectory("/3ds")
 		System.createDirectory("/3ds/data")
+		System.createDirectory("/3ds/data/freeShop")
 	end
 	System.createDirectory(freeshopPath)
 	
@@ -652,7 +653,7 @@ function init()
 	
 	line = 65
 	Screen.debugPrint(5, line, "Checking encTitleKeys.bin...", WHITE, TOP_SCREEN)
-	local freeshopPath = "/3ds/data/freeshop"
+	local freeshopPath = "/3ds/data/freeshop/keys"
 	if config.useFreeShop1Path.value then freeshopPath = "/freeshop" end
 	if System.doesFileExist(freeshopPath.."/encTitleKeys.bin") then
 		local encTitleKeys = io.open(freeshopPath.."/encTitleKeys.bin", FREAD)
