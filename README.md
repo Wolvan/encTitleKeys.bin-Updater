@@ -1,4 +1,5 @@
-#Titlekeys Tools
+# This project is dead
+# Titlekeys Tools
 A tool to easily update the encTitleKeys.bin for [freeShop](https://github.com/Cruel/freeShop) based on [lpp-3ds](https://github.com/Rinnegatamante/lpp-3ds) or download the `seeddb.bin` and `decTitleKeys.bin`
 What started out as a fork of MatMaf's encTitleKeys.bin Updater has now been turned into a more all round solution to interact with 3ds.titlekeys.com from your 3ds.
 
